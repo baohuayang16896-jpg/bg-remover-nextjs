@@ -7,17 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "npm run pages:build && wrangler pages dev",
+    "pages:build": "npx @opennextjs/cloudflare build",
     "deploy": "npm run pages:build && wrangler pages deploy"
   },
   "dependencies": {
     "next": "15.2.4",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1",
+    "@opennextjs/cloudflare": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
