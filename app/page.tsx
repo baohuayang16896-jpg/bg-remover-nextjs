@@ -4,8 +4,10 @@ import { useState } from 'react';
 import ImageUpload from '@/components/ImageUpload';
 import ImageResult from '@/components/ImageResult';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import GoogleLogin from '@/components/GoogleLogin';
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [originalImage, setOriginalImage] = useState<string>('');
   const [processedImage, setProcessedImage] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -56,24 +58,34 @@ export default function Home() {
             一键去除图片背景，快速生成透明图
           </p>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-              {error}
+          <GoogleLogin onLogin={() => setIsLoggedIn(true)} />
+
+          {!isLoggedIn ? (
+            <div className="text-center text-gray-500 py-12">
+              请先登录以使用背景移除功能
             </div>
-          )}
+          ) : (
+            <>
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+                  {error}
+                </div>
+              )}
 
-          {!originalImage && !loading && (
-            <ImageUpload onUpload={handleFileUpload} />
-          )}
+              {!originalImage && !loading && (
+                <ImageUpload onUpload={handleFileUpload} />
+              )}
 
-          {loading && <LoadingSpinner />}
+              {loading && <LoadingSpinner />}
 
-          {processedImage && (
-            <ImageResult
-              originalImage={originalImage}
-              processedImage={processedImage}
-              onReset={handleReset}
-            />
+              {processedImage && (
+                <ImageResult
+                  originalImage={originalImage}
+                  processedImage={processedImage}
+                  onReset={handleReset}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
