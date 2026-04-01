@@ -23,40 +23,40 @@ export default function GoogleLogin({ onLogin }: { onLogin: (user: User) => void
       return;
     }
 
-    // 加载 Google SDK
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.onload = () => {
+    // 等待 Google SDK 加载
+    const checkGoogle = setInterval(() => {
       const google = (window as any).google;
-      if (!google) return;
-
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (response: any) => {
-          const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
-          const userData = {
-            email: userInfo.email,
-            name: userInfo.name,
-            picture: userInfo.picture,
-          };
-          localStorage.setItem('user', JSON.stringify(userData));
-          setUser(userData);
-          onLogin(userData);
-        },
-      });
-
-      const btn = document.getElementById('googleBtn');
-      if (btn) {
-        google.accounts.id.renderButton(btn, { 
-          theme: 'outline', 
-          size: 'large', 
-          text: 'signin_with', 
-          locale: 'zh_CN' 
+      if (google?.accounts?.id) {
+        clearInterval(checkGoogle);
+        
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response: any) => {
+            const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
+            const userData = {
+              email: userInfo.email,
+              name: userInfo.name,
+              picture: userInfo.picture,
+            };
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+            onLogin(userData);
+          },
         });
+
+        const btn = document.getElementById('googleBtn');
+        if (btn) {
+          google.accounts.id.renderButton(btn, { 
+            theme: 'outline', 
+            size: 'large', 
+            text: 'signin_with', 
+            locale: 'zh_CN' 
+          });
+        }
       }
-    };
-    document.head.appendChild(script);
+    }, 100);
+
+    return () => clearInterval(checkGoogle);
   }, [onLogin]);
 
   const handleLogout = () => {
