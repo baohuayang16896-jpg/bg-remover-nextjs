@@ -27,41 +27,37 @@ export default function GoogleLogin({ onLogin }: { onLogin: (user: User) => void
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
-    script.onload = initGoogle;
-    document.head.appendChild(script);
-  }, []);
+    script.onload = () => {
+      const google = (window as any).google;
+      if (!google) return;
 
-  const initGoogle = () => {
-    if (typeof window === 'undefined' || !(window as any).google) return;
-
-    const google = (window as any).google;
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-    });
-
-    const btn = document.getElementById('googleBtn');
-    if (btn) {
-      google.accounts.id.renderButton(btn, { 
-        theme: 'outline', 
-        size: 'large', 
-        text: 'signin_with', 
-        locale: 'zh_CN' 
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response: any) => {
+          const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
+          const userData = {
+            email: userInfo.email,
+            name: userInfo.name,
+            picture: userInfo.picture,
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          setUser(userData);
+          onLogin(userData);
+        },
       });
-    }
-  };
 
-  const handleCredentialResponse = (response: any) => {
-    const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
-    const userData = {
-      email: userInfo.email,
-      name: userInfo.name,
-      picture: userInfo.picture,
+      const btn = document.getElementById('googleBtn');
+      if (btn) {
+        google.accounts.id.renderButton(btn, { 
+          theme: 'outline', 
+          size: 'large', 
+          text: 'signin_with', 
+          locale: 'zh_CN' 
+        });
+      }
     };
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-    onLogin(userData);
-  };
+    document.head.appendChild(script);
+  }, [onLogin]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
