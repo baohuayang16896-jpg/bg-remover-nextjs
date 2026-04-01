@@ -32,17 +32,23 @@ export default function GoogleLogin({ onLogin }: { onLogin: (user: User) => void
   }, []);
 
   const initGoogle = () => {
-    if (typeof google === 'undefined') return;
+    if (typeof window === 'undefined' || !(window as any).google) return;
 
+    const google = (window as any).google;
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: handleCredentialResponse,
     });
 
-    google.accounts.id.renderButton(
-      document.getElementById('googleBtn')!,
-      { theme: 'outline', size: 'large', text: 'signin_with', locale: 'zh_CN' }
-    );
+    const btn = document.getElementById('googleBtn');
+    if (btn) {
+      google.accounts.id.renderButton(btn, { 
+        theme: 'outline', 
+        size: 'large', 
+        text: 'signin_with', 
+        locale: 'zh_CN' 
+      });
+    }
   };
 
   const handleCredentialResponse = (response: any) => {
