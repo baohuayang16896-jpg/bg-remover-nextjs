@@ -6,20 +6,20 @@ import { SessionProvider } from "next-auth/react"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Background Remover",
-  description: "Remove image backgrounds instantly with AI",
+title: "AI Background Remover",
+description: "Remove image backgrounds instantly with AI",
 }
 
 export default function RootLayout({
-  children,
+children,
 }: {
-  children: React.ReactNode
+children: React.ReactNode
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
-      </body>
-    </html>
-  )
+return (
+<html lang="en">
+<body className={inter.className}>
+<SessionProvider>{children}</SessionProvider>
+</body>
+</html>
+)
 }
